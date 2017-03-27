@@ -11,12 +11,12 @@ QString processArgs(int argc, char **argv)
     QString url;
     if (argc < 2) {
         printf(" -aid / --access-id ACCESS_ID\t: Access ID for SkyWave API\n\n"
-               " -e / --end-utc END_UTC\t\t: UTC time for end data (yyyy-MM-dd;HH:mm:ss)\n\n"
+               " -e / --end-utc END_UTC\t\t: UTC time for end data (yyyy-MM-dd#HH:mm:ss)\n\n"
                " -g / --gateway GATEWAY\t\t: SkyWave API Gateway address\n\n"
                " -h / --help\t\t\t: Print this help info\n\n"
                " -id / --module-id\t\t: SkyWave Module ID\n\n"
                " -pwd / --password PASSWORD\t: Password for SkyWave API\n\n"
-               " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd;HH:mm:ss)\n\n"
+               " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd#HH:mm:ss)\n\n"
                " -t / --timeout TIMEOUT(ms)\t: Timeout for end process (default 5000ms)\n\n"
                " -v / --version\t\t\t: Print version of plugins\n\n"
                " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -t 10000\n\n"
@@ -29,12 +29,12 @@ QString processArgs(int argc, char **argv)
         if (arg1 == QLatin1String("-h") ||
             arg1 == QLatin1String("--help")) {
             printf(" -aid / --access-id ACCESS_ID\t: Access ID for SkyWave API\n\n"
-                   " -e / --end-utc END_UTC\t\t: UTC time for end data (yyyy-MM-dd;HH:mm:ss)\n\n"
+                   " -e / --end-utc END_UTC\t\t: UTC time for end data (yyyy-MM-dd#HH:mm:ss)\n\n"
                    " -g / --gateway GATEWAY\t\t: SkyWave API Gateway address\n\n"
                    " -h / --help\t\t\t: Print this help info\n\n"
                    " -id / --module-id\t\t: SkyWave Module ID\n\n"
                    " -pwd / --password PASSWORD\t: Password for SkyWave API\n\n"
-                   " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd;HH:mm:ss)\n\n"
+                   " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd#HH:mm:ss)\n\n"
                    " -t / --timeout TIMEOUT(ms)\t: Timeout for end process (default 5000ms)\n\n"
                    " -v / --version\t\t\t: Print version of plugins\n\n"
                    " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -t 10000\n\n"
