@@ -8,13 +8,15 @@ worker::worker(QObject *parent) : QObject(parent)
     process = 1;
 }
 
-void worker::request(QString urls)
+void worker::request(QString urls, QString sinMin)
 {
     QNetworkRequest request;
 //    urls = "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2017-03-23%2000:00:00";
 //    urls = "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2017-03-27 03:43:02&end_utc=2017-03-27 04:43:02&mobile_id=01020268SKY7559";
     QUrl url =  QUrl::fromEncoded(urls.toLocal8Bit().data());
 
+//    qDebug() << url;
+    sinMin_conf = sinMin;
     request.setUrl(url);
     manager->get(request);
 
@@ -56,10 +58,11 @@ void worker::parsing(QByteArray data)
 //                }
 //                if (v.toObject().value("MobileID").toString() ==
 //                        monita_cfg.sky[indexGateway].mdm[i].modem_id) {
-//                    QStringList SIN_MIN = monita_cfg.sky[indexGateway].SIN_MIN.split(","); QStringList SIN_MIN_List;
-//                    for (int j = 0; j < SIN_MIN.length(); j++) {SIN_MIN_List.append(SIN_MIN.at(j).split(";"));}
-//                    for (int j = 0; j < SIN_MIN_List.length(); j+=2) {
-//                        if (v.toObject().value("SIN").toInt() == SIN_MIN_List.at(j).toInt()) {
+                    QStringList SIN_MIN = sinMin_conf.split(","); QStringList SIN_MIN_List;
+                    for (int j = 0; j < SIN_MIN.length(); j++) {SIN_MIN_List.append(SIN_MIN.at(j).split("#"));}
+                    for (int j = 0; j < SIN_MIN_List.length(); j+=2) {
+//                        printf("SIN from JSON = %d, SIN from API = %d\n", v.toObject().value("SIN").toInt(), SIN_MIN_List.at(j).toInt());
+                        if (v.toObject().value("SIN").toInt() == SIN_MIN_List.at(j).toInt()) {
 //                            monita_cfg.sky[indexGateway].mdm[i].val_tu.clear();
                             QJsonArray LoadArray  = v.toObject().value("RawPayload").toArray();
 //                            LoadArray.removeAt(0); LoadArray.removeAt(0);
@@ -93,6 +96,9 @@ void worker::parsing(QByteArray data)
                                         valObject["MobileID"] = v.toObject().value("MobileID").toString();
                                         valObject["ReceiveUTC"] = v.toObject().value("ReceiveUTC").toString();
                                         valObject["Payload"] = raw;
+//                                        valObject["SIN"] = v.toObject().value("SIN").toInt();
+                                        valObject["SIN"] = LoadArray.at(0).toInt();
+                                        valObject["MIN"] = LoadArray.at(1).toInt();
 
 //                                        if (monita_cfg.sky[indexGateway].mdm[i].id_tu.length() > monita_cfg.sky[indexGateway].mdm[i].val_tu.length()) {
 //                                            int iVal = monita_cfg.sky[indexGateway].mdm[i].id_tu.length() - monita_cfg.sky[indexGateway].mdm[i].val_tu.length();
@@ -106,8 +112,8 @@ void worker::parsing(QByteArray data)
                                     RawBiner.clear();
 //                                }
                             }
-//                            if ((v.toObject().value("Payload").toObject().value("SIN").toInt() == SIN_MIN_List.at(j).toInt()) &&
-//                                    (v.toObject().value("Payload").toObject().value("MIN").toInt() == SIN_MIN_List.at(j+1).toInt())) {
+                            if ((v.toObject().value("Payload").toObject().value("SIN").toInt() == SIN_MIN_List.at(j).toInt()) &&
+                                    (v.toObject().value("Payload").toObject().value("MIN").toInt() == SIN_MIN_List.at(j+1).toInt())) {
 //                                if (v.toObject().value("Payload").toObject().value("Name").toString() == DATA_TRACKING) {
                                 if (v.toObject().value("Payload").toObject().value("Name").toString() == "noEIO") {
 //                                    monita_cfg.sky[indexGateway].mdm[i].val_tu.clear();
@@ -142,8 +148,10 @@ void worker::parsing(QByteArray data)
                                     valObject["MobileID"] = v.toObject().value("MobileID").toString();
                                     valObject["ReceiveUTC"] = v.toObject().value("ReceiveUTC").toString();
                                     valObject["Payload"] = load;
+                                    valObject["SIN"] = v.toObject().value("Payload").toObject().value("SIN").toInt();
+                                    valObject["MIN"] = v.toObject().value("Payload").toObject().value("MIN").toInt();
                                 }
-//                            }
+                            }
 //                            if (!monita_cfg.sky[indexGateway].mdm[i].query.isEmpty()) {
 //                                if (monita_cfg.sky[indexGateway].mdm[i].id_tu.length() > monita_cfg.sky[indexGateway].mdm[i].val_tu.length()) {
 //                                    for (int j = 0; j < monita_cfg.sky[indexGateway].mdm[i].val_tu.length(); j++) {
@@ -165,8 +173,8 @@ void worker::parsing(QByteArray data)
 //                                    }
 //                                }
 //                            }
-//                        }
-//                    }
+                        }
+                    }
 //                }
 //            }
             if (!valObject["Payload"].isUndefined()) valArray.append(valObject);
@@ -246,14 +254,16 @@ void worker::parsing(QByteArray data)
 //        log.write("SkyWave","Selesai .. " + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss:zzz"), monita_cfg.config.at(9).toInt());
         QJsonObject monita;
         if (!MessageUTC.isEmpty() && !array.isEmpty()) {
-            monita["monita"] = valArray;
+            monita["skywave"] = valArray;
             monita["NextStartUTC"] = MessageUTC;
             QJsonDocument doc(monita);
         //    QString formattedJsonString = doc.toJson(QJsonDocument::Indented);
             QString formattedJsonString = doc.toJson(QJsonDocument::Compact);
-            qDebug() << formattedJsonString;
+//            qDebug() << formattedJsonString;
+            printf("%s\n\n", formattedJsonString.toLatin1().data());
         } else {
-            qDebug() << "{\"ERR\":\"SkyWave not responding ..\"}";
+//            qDebug() << "{\"ERR\":\"SkyWave not responding ..\"}";
+            printf("{\"ERR\":\"SkyWave not responding ..\"}\n\n");
         }
 
         emit close();

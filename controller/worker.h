@@ -28,10 +28,11 @@ class worker : public QObject
 public:
     explicit worker(QObject *parent = 0);
 
-    void request(QString urls);
+    void request(QString urls, QString sinMin);
     void parsing(QByteArray data);
 
     int process;
+    QString sinMin_conf;
 
     QString format_5cut_32get(QString biner);
     QStringList parsingRawPayload(QString RawData);

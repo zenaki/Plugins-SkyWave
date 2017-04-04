@@ -17,11 +17,12 @@ QString processArgs(int argc, char **argv)
                " -id / --module-id\t\t: SkyWave Module ID\n\n"
                " -pwd / --password PASSWORD\t: Password for SkyWave API\n\n"
                " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd#HH:mm:ss)\n\n"
+               " -sm / --sin-min SIN_MIN\t: SIN MIN Config (SIN#MIN)\n\n"
                " -t / --timeout TIMEOUT(ms)\t: Timeout for end process (default 5000ms)\n\n"
                " -v / --version\t\t\t: Print version of plugins\n\n"
-               " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -t 10000\n\n"
-               " ex 2 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
-               " ex 3 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -id 01020268SKY7559 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
+               " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -s 2017-03-27#03:43:02 -t 10000\n\n"
+               " ex 2 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
+               " ex 3 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -id 01020268SKY7559 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
               );
         err = false;
     } else if (argc == 2) {
@@ -35,11 +36,12 @@ QString processArgs(int argc, char **argv)
                    " -id / --module-id\t\t: SkyWave Module ID\n\n"
                    " -pwd / --password PASSWORD\t: Password for SkyWave API\n\n"
                    " -s / --start-utc START_UTC\t: UTC time for start data (yyyy-MM-dd#HH:mm:ss)\n\n"
+                   " -sm / --sin-min SIN_MIN\t: SIN MIN Config (SIN#MIN)\n\n"
                    " -t / --timeout TIMEOUT(ms)\t: Timeout for end process (default 5000ms)\n\n"
                    " -v / --version\t\t\t: Print version of plugins\n\n"
-                   " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -t 10000\n\n"
-                   " ex 2 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
-                   " ex 3 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -id 01020268SKY7559 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
+                   " ex 1 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -s 2017-03-27#03:43:02 -t 10000\n\n"
+                   " ex 2 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
+                   " ex 3 : -g http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/ -aid 150103286 -pwd ZRM3B9SSDI -sm 128#1 -id 01020268SKY7559 -s 2017-03-27#03:43:02 -e 2017-03-27#04:43:02 -t 10000\n\n"
                   );
             err = false;
         } else if (arg1 == QLatin1String("-v") ||
@@ -48,7 +50,13 @@ QString processArgs(int argc, char **argv)
             err = false;
         }
     } else  if (argc > 2) {
-        QString gateway = "", module_id = "", access_id = "", password = "", start_utc = "", end_utc = "";
+        QString gateway = "",
+                module_id = "",
+                access_id = "",
+                password = "",
+                sin_min = "",
+                start_utc = "",
+                end_utc = "";
 //        int timeout = 0;
         for (int i = 1; i < argc; i++) {
             QString arg1(argv[i]);
@@ -118,7 +126,8 @@ QString processArgs(int argc, char **argv)
         }
     }
     if (err) {
-        printf("{\"ERR\": \"Wrong Pluggins Commands\"}\n");
+        printf("{\"ERR\": \"Wrong Pluggins Commands\"}\n\n");
+        return "";
     }
 
     return url;
@@ -141,15 +150,38 @@ int timeOut(int argc, char **argv) {
     return tOut;
 }
 
+QString SinMin(int argc, char **argv) {
+    QString sin_min = "";
+
+    if (argc > 2) {
+        for (int i = 1; i < argc; i++) {
+            QString arg1(argv[i]);
+            if (arg1 == QLatin1String("-sm") || arg1 == QLatin1String("--sin-min")) {
+                sin_min = argv[i+1];
+            }
+        }
+    }
+
+//    qDebug() << "timeout = " + QString::number(tOut);
+
+    return sin_min;
+}
+
 int main(int argc, char **argv)
 {
     QCoreApplication a(argc, argv);
 
     worker w;
     a.connect(&w, SIGNAL(close()), &a, SLOT(quit()));
-    w.request(processArgs(argc, argv));
-    QTimer::singleShot(timeOut(argc, argv), &a, SLOT(quit()));
-//    QTimer::singleShot(10000, &a, SLOT(quit()));
+    QString url = processArgs(argc, argv);
+    QString sinMin = SinMin(argc, argv);
+    if (!url.isEmpty()) {
+        w.request(url, sinMin);
+        QTimer::singleShot(timeOut(argc, argv), &a, SLOT(quit()));
+    //    QTimer::singleShot(10000, &a, SLOT(quit()));
 
-    return a.exec();
+        return a.exec();
+    } else {
+        return 0;
+    }
 }
