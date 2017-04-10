@@ -133,12 +133,12 @@ void worker::parsing(QByteArray data)
 //                                            monita_cfg.sky[indexGateway].mdm[i].val_tu[1] = vField.toObject().value("Value").toString();
 //                                            monita_cfg.sky[indexGateway].mdm[i].val_tu[1] = QString::number(monita_cfg.sky[indexGateway].mdm[i].val_tu.at(1).toFloat()/60000.000000000, 'f', 9);
                                             load[1] = QString::number(vField.toObject().value("Value").toString().toFloat()/60000.000000000, 'f', 9);
+                                        }  else if (vField.toObject().value("Name").toString() == "speed") {
+//                                            monita_cfg.sky[indexGateway].mdm[i].val_tu[3] = vField.toObject().value("Value").toString();
+                                            load[2] = QString::number(vField.toObject().value("Value").toString().toFloat()/10, 'f', 9);
                                         } else if (vField.toObject().value("Name").toString() == "heading") {
 //                                            monita_cfg.sky[indexGateway].mdm[i].val_tu[2] = vField.toObject().value("Value").toString();
-                                            load[2] = vField.toObject().value("Value").toString();
-                                        } else if (vField.toObject().value("Name").toString() == "speed") {
-//                                            monita_cfg.sky[indexGateway].mdm[i].val_tu[3] = vField.toObject().value("Value").toString();
-                                            load[3] = vField.toObject().value("Value").toString();
+                                            load[3] = QString::number(vField.toObject().value("Value").toString().toFloat()/10, 'f', 9);
                                         }
                                     }
 //                                    if (QDateTime::fromTime_t(monita_cfg.sky[indexGateway].mdm[i].last_utc.toUInt(&ok)).toString("HH").toInt() == 7) {
