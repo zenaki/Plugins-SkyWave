@@ -46,15 +46,21 @@ QString processArgs(int argc, char **argv)
             err = false;
         } else if (arg1 == QLatin1String("-v") ||
                  arg1 == QLatin1String("--version")) {
-            printf(" SkyWave Plugins Version: %s \nPT. DaunBiru Engiinering\nwww.daunbiru.com\n\n", VERSION);
+            QString compilationTime = QString("%1 %2").arg(__DATE__).arg(__TIME__);
+            QString version = VERSION;
+            printf("Plugin SkyWave Version:  %s\nPT. DaunBiru Engineering\nwww.daunbiru.com\n\n"
+                   "build on: %s (UTC+7)\n",
+                   version.toUtf8().data(),
+                   compilationTime.toUtf8().data());
             err = false;
         }
-    } else  if (argc > 2) {
+    }
+    else  if (argc > 2) {
         QString gateway = "",
                 module_id = "",
                 access_id = "",
                 password = "",
-                sin_min = "",
+//                sin_min = "",
                 start_utc = "",
                 end_utc = "";
 //        int timeout = 0;
@@ -97,12 +103,16 @@ QString processArgs(int argc, char **argv)
 //        qDebug() << "module id = " + module_id;
 //        qDebug() << "start utc = " + start_utc;
 //        qDebug() << "end utc = " + end_utc;
+//        gateway = "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/";
+//        access_id = "150103286";
+//        password = "ZRM3B9SSDI";
+//        start_utc = "2017-11-21 00:00:00";
         if (!gateway.isEmpty()) {
             if (!access_id.isEmpty() && !password.isEmpty()) {
                 if (QDateTime::fromString(start_utc, "yyyy-MM-dd HH:mm:ss").isValid()) {
 //                    if (timeout <= 0) timeout = 5000;
-                    // "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2016-09-02%2005:40:05"
-                    // "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2017-03-27 03:43:02&end_utc=2017-03-27 04:43:02&mobile_id=01020268SKY7559"
+//                     "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2016-09-02%2005:40:05"
+//                     "http://m2prime.aissat.com/RestMessages.svc/get_return_messages.json/?access_id=150103286&password=ZRM3B9SSDI&start_utc=2017-03-27 03:43:02&end_utc=2017-03-27 04:43:02&mobile_id=01020268SKY7559"
                     if (QDateTime::fromString(end_utc, "yyyy-MM-dd HH:mm:ss").isValid()) {
                         if (!module_id.isEmpty()) {
                             url = gateway + "?access_id=" + access_id + "&password=" + password + "&start_utc=" + start_utc + "&end_utc=" + end_utc + "&mobile_id=" + module_id;
@@ -134,7 +144,7 @@ QString processArgs(int argc, char **argv)
 }
 
 int timeOut(int argc, char **argv) {
-    int tOut = 0;
+    int tOut = 60000;
 
     if (argc > 2) {
         for (int i = 1; i < argc; i++) {
@@ -151,7 +161,7 @@ int timeOut(int argc, char **argv) {
 }
 
 QString SinMin(int argc, char **argv) {
-    QString sin_min = "";
+    QString sin_min = "128#1";
 
     if (argc > 2) {
         for (int i = 1; i < argc; i++) {
